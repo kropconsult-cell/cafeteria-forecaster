@@ -1,0 +1,195 @@
+{
+  "model_name": "Cafeteria meal-demand forecaster",
+  "version": "1.0",
+  "created": "2026-11-16",
+  "intended_use": "Decision support for the 4:00 p.m. preparation decision: forecast meals demanded tomorrow. A person makes the final decision.",
+  "not_intended_for": [
+    "automatic ordering without human review",
+    "other cafeterias or institutions",
+    "days with inputs outside the training ranges",
+    "after major changes (new menu, pricing, layout)"
+  ],
+  "data": {
+    "source": "SYNTHETIC teaching data (generate_dataset.py, seed 42)",
+    "sha256": "d5735f0ab730de06c1efa42de7824531f8412cb1dd910396818cb32412d20190",
+    "training_period": [
+      "2021-01-11",
+      "2023-11-26"
+    ],
+    "validation_period": [
+      "2023-11-27",
+      "2024-07-08"
+    ],
+    "test_period": [
+      "2024-07-09",
+      "2025-02-18"
+    ]
+  },
+  "target": "meals_demanded",
+  "features": [
+    "day_of_week",
+    "is_weekend",
+    "students_on_campus",
+    "exam_period",
+    "public_holiday",
+    "special_event",
+    "academic_break",
+    "term_in_session",
+    "semester_week",
+    "forecast_rainfall_mm",
+    "forecast_temperature_c",
+    "meals_demanded_lag_1",
+    "meals_demanded_lag_7",
+    "meals_demanded_rolling_7d"
+  ],
+  "day_of_week_categories": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ],
+  "calendar_states": {
+    "registration": {
+      "term_in_session": 0,
+      "exam_period": 0,
+      "academic_break": 0,
+      "semester_week": [
+        1,
+        1
+      ]
+    },
+    "teaching": {
+      "term_in_session": 1,
+      "exam_period": 0,
+      "academic_break": 0,
+      "semester_week": [
+        2,
+        15
+      ]
+    },
+    "exams": {
+      "term_in_session": 1,
+      "exam_period": 1,
+      "academic_break": 0,
+      "semester_week": [
+        16,
+        17
+      ]
+    },
+    "break": {
+      "term_in_session": 0,
+      "exam_period": 0,
+      "academic_break": 1,
+      "semester_week": [
+        0,
+        0
+      ]
+    }
+  },
+  "training_ranges": {
+    "is_weekend": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "students_on_campus": {
+      "min": 562.0,
+      "max": 4303.0
+    },
+    "exam_period": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "public_holiday": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "special_event": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "academic_break": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "term_in_session": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "semester_week": {
+      "min": 0.0,
+      "max": 17.0
+    },
+    "forecast_rainfall_mm": {
+      "min": 0.0,
+      "max": 84.1
+    },
+    "forecast_temperature_c": {
+      "min": 14.2,
+      "max": 29.6
+    },
+    "meals_demanded_lag_1": {
+      "min": 73.0,
+      "max": 3884.0
+    },
+    "meals_demanded_lag_7": {
+      "min": 73.0,
+      "max": 3884.0
+    },
+    "meals_demanded_rolling_7d": {
+      "min": 234.9,
+      "max": 2522.0
+    }
+  },
+  "prediction_interval_80": {
+    "low_offset": -51.02176785714291,
+    "high_offset": 305.91882500000025,
+    "test_coverage": 0.7377777777777778
+  },
+  "metrics": {
+    "validation": {
+      "MAE": 136.06683033589863,
+      "MSE": 44494.29223405281,
+      "RMSE": 210.93670196068965,
+      "R2": 0.9595180746924076,
+      "mean_error": 98.05865694805186
+    },
+    "test": {
+      "MAE": 133.57220776495103,
+      "MSE": 35737.60427140686,
+      "RMSE": 189.0439215404898,
+      "R2": 0.9562811326441498,
+      "mean_error": 67.94577575436902
+    }
+  },
+  "monitoring": {
+    "alert_threshold_mae": 170.0835379198733,
+    "rule": "alert if the 14-day rolling MAE stays above the threshold for 7 consecutive days"
+  },
+  "review_rules": [
+    "any numeric input outside training_ranges",
+    "special_event = 1"
+  ],
+  "limitations": [
+    "trained on synthetic data",
+    "few special events in the history",
+    "assumes unmet demand is recorded",
+    "Random Forests cannot extrapolate beyond training ranges",
+    "80 % range covered fewer than 80 % of test days"
+  ],
+  "costs_used_for_evaluation_kes": {
+    "unmet_meal": 120,
+    "wasted_meal": 60
+  },
+  "software": {
+    "python": "3.13.18",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "joblib": "1.6.0",
+    "scipy": "1.16.3"
+  },
+  "seed": 42
+}
